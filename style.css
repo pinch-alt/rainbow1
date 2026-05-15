@@ -86,9 +86,10 @@ game-overlay {
   position: absolute;
   inset: 0;
   z-index: 20;
-  display: none; /* Changed from flex to none */
+  display: flex;
   justify-content: center;
   align-items: center;
   background: radial-gradient(circle at center, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.8) 100%);
   backdrop-filter: blur(8px);
+  visibility: hidden;
 }

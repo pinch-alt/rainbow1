@@ -204,6 +204,11 @@ class Game {
         window.addEventListener('pointerdown', updatePointer);
         window.addEventListener('pointermove', updatePointer);
         
+        this.initialized = false;
+        this.isPausedBySDK = false;
+        this.running = false;
+        this.lastTime = 0;
+
         this.init();
         if (this.overlay) {
             console.log("Showing overlay...");
@@ -211,8 +216,6 @@ class Game {
                 this.nickname = name;
                 this.start();
             });
-        } else {
-            console.error("Overlay not found!");
         }
     }
 
@@ -220,7 +223,7 @@ class Game {
         this.core = { radius: 18, colorIndex: 0, pulse: 0 };
         this.shield = { angle: 0, arcLength: Math.PI * 0.4, distance: 45, thickness: 8 };
         this.enemies = []; this.score = 0; this.stage = 1; this.totalMerges = 0; this.gameTime = 0;
-        this.running = false; this.spawnTimer = 0; 
+        this.spawnTimer = 0; 
         this.baseSpawnRate = 1.09375; 
         this.currentSpeed = 200;
         this.lastEnemyDistance = 0;
@@ -231,19 +234,23 @@ class Game {
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
         this.center = { x: this.canvas.width / 2, y: this.canvas.height / 2 };
+        if (this.running) this.draw();
     }
 
     start() {
         this.init();
+        this.initialized = true;
         this.resume();
     }
 
     pause() {
+        this.isPausedBySDK = true;
         this.running = false;
     }
 
     resume() {
-        if (!this.running) {
+        this.isPausedBySDK = false;
+        if (this.initialized && !this.running) {
             this.running = true;
             this.lastTime = performance.now();
             requestAnimationFrame((t) => this.gameLoop(t));
@@ -277,7 +284,7 @@ class Game {
 
         // Speed logic
         let inc = this.currentSpeed >= 700 ? 1 : (this.currentSpeed >= 600 ? 2 : (this.currentSpeed >= 500 ? 4 : 8));
-        this.currentSpeed += (inc / 2) * dt; // Halved as per blueprint
+        this.currentSpeed += (inc / 2) * dt;
         
         // Conditional spawn rate based on speed
         if (this.currentSpeed >= 500) {
@@ -337,6 +344,7 @@ class Game {
                     if (navigator.vibrate) navigator.vibrate(40);
                 } else {
                     this.running = false;
+                    this.initialized = false;
                     const leaderboard = this.updateLeaderboard();
                     if (this.overlay) this.overlay.show('gameover', () => this.start(), this.score, leaderboard);
                     return;
