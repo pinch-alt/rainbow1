@@ -17,7 +17,7 @@ class GameHUD extends HTMLElement {
         this.attachShadow({ mode: 'open' });
     }
     update(score, stage, color, speed) {
-        this.shadowRoot.innerHTML = `
+        this.shadowRoot.innerHTML = \`
             <style>
                 :host { display: block; font-family: 'Outfit', sans-serif; color: white; width: 100%; }
                 .container {
@@ -36,11 +36,11 @@ class GameHUD extends HTMLElement {
                 .speed-val { color: #00ffcc; }
             </style>
             <div class="container">
-                <div class="stat"><span class="label">Stage</span><span class="value">${stage}</span></div>
-                <div class="stat"><span class="label">Target</span><span class="value">${color}</span></div>
-                <div class="stat"><span class="label">Score</span><span class="value">${score}</span></div>
-                <div class="stat"><span class="label">Speed</span><span class="value speed-val">${Math.floor(speed)}</span></div>
-            </div>`;
+                <div class="stat"><span class="label">Stage</span><span class="value">\${stage}</span></div>
+                <div class="stat"><span class="label">Target</span><span class="value">\${color}</span></div>
+                <div class="stat"><span class="label">Score</span><span class="value">\${score}</span></div>
+                <div class="stat"><span class="label">Speed</span><span class="value speed-val">\${Math.floor(speed)}</span></div>
+            </div>\`;
     }
 }
 
@@ -55,35 +55,35 @@ class GameOverlay extends HTMLElement {
         let content = '';
 
         if (isStart) {
-            content = `
+            content = \`
                 <p>Protect the core. Match the colors.</p>
                 <input type="text" id="nicknameInput" placeholder="ENTER NICKNAME" maxlength="10" />
                 <button id="actionBtn">INITIATE</button>
-            `;
+            \`;
         } else {
             let leaderboardHTML = '';
             if (leaderboard.length > 0) {
-                leaderboardHTML = `
+                leaderboardHTML = \`
                     <div class="leaderboard">
                         <h2>TOP ORBITALS</h2>
-                        ${leaderboard.map((entry, i) => `
+                        \${leaderboard.map((entry, i) => \`
                             <div class="entry">
-                                <span>${i + 1}. ${entry.name}</span>
-                                <span>${entry.score}</span>
+                                <span>\${i + 1}. \${entry.name}</span>
+                                <span>\${entry.score}</span>
                             </div>
-                        `).join('')}
+                        \`).join('')}
                     </div>
-                `;
+                \`;
             }
-            content = `
-                <div class="final-score">Final Score: <span>${finalScore}</span></div>
-                ${leaderboardHTML}
+            content = \`
+                <div class="final-score">Final Score: <span>\${finalScore}</span></div>
+                \${leaderboardHTML}
                 <button id="actionBtn">REBOOT</button>
-            `;
+            \`;
             if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
         }
         
-        this.shadowRoot.innerHTML = `
+        this.shadowRoot.innerHTML = \`
             <style>
                 :host {
                     display: flex;
@@ -122,9 +122,9 @@ class GameOverlay extends HTMLElement {
                 button:active { transform: scale(0.95); }
             </style>
             <div class="overlay-content">
-                <h1>${title}</h1>
-                ${content}
-            </div>`;
+                <h1>\${title}</h1>
+                \${content}
+            </div>\`;
         
         const btn = this.shadowRoot.getElementById('actionBtn');
         const input = this.shadowRoot.getElementById('nicknameInput');
@@ -205,7 +205,6 @@ class Game {
         window.addEventListener('pointermove', updatePointer);
         
         this.initialized = false;
-        this.isPausedBySDK = false;
         this.running = false;
         this.lastTime = 0;
 
@@ -244,12 +243,10 @@ class Game {
     }
 
     pause() {
-        this.isPausedBySDK = true;
         this.running = false;
     }
 
     resume() {
-        this.isPausedBySDK = false;
         if (this.initialized && !this.running) {
             this.running = true;
             this.lastTime = performance.now();

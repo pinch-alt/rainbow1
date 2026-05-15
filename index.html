@@ -28,16 +28,22 @@
             "onEvent": function(event) {
                 switch (event.name) {
                     case "SDK_GAME_START":
-                        console.log("SDK_GAME_START");
+                        console.log("GD SDK: SDK_GAME_START");
                         if (window.game && typeof window.game.resume === 'function') {
                             window.game.resume();
                         }
                         break;
                     case "SDK_GAME_PAUSE":
-                        console.log("SDK_GAME_PAUSE");
+                        console.log("GD SDK: SDK_GAME_PAUSE");
                         if (window.game && typeof window.game.pause === 'function') {
                             window.game.pause();
                         }
+                        break;
+                    case "SDK_READY":
+                        console.log("GD SDK: SDK_READY");
+                        break;
+                    case "SDK_ERROR":
+                        console.warn("GD SDK: SDK_ERROR", event);
                         break;
                 }
             },
