@@ -20,5 +20,33 @@
     <div class="noise"></div>
 
     <script src="main.js" type="module"></script>
+
+    <!-- GameDistribution SDK -->
+    <script type="text/javascript">
+        window["GD_OPTIONS"] = {
+            "gameId": "b2a0dfd7914b40d99441eb8d12fbf2f4",
+            "onEvent": function(event) {
+                switch (event.name) {
+                    case "SDK_GAME_START":
+                        if (window.game && typeof window.game.resume === 'function') {
+                            window.game.resume();
+                        }
+                        break;
+                    case "SDK_GAME_PAUSE":
+                        if (window.game && typeof window.game.pause === 'function') {
+                            window.game.pause();
+                        }
+                        break;
+                }
+            },
+        };
+        (function(d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) return;
+            js = d.createElement(s); js.id = id;
+            js.src = 'https://html5.api.gamedistribution.com/main.min.js';
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'gamedistribution-jssdk'));
+    </script>
 </body>
 </html>

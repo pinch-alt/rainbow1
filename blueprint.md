@@ -58,3 +58,8 @@
 *   **Nickname Input:** Added a text input field to the start screen with a 10-character limit.
 *   **Score Persistence:** Implemented `updateLeaderboard()` using `localStorage` to save the player's name and score. This ensures entries are permanently stored in the user's browser until displaced from the top 10 by a higher score.
 *   **Top 10 Display:** The game-over screen now displays a sorted list of the top 10 orbital pilots.
+
+### Step 10: GameDistribution SDK Integration
+*   **SDK Setup:** Integrated the GameDistribution HTML5 SDK for cross-platform monetization and distribution.
+*   **Game ID:** Configured with the specific Game ID `b2a0dfd7914b40d99441eb8d12fbf2f4`.
+*   **Lifecycle Management:** Implemented `pause()` and `resume()` logic to handle `SDK_GAME_PAUSE` and `SDK_GAME_START` events, ensuring the game state is preserved during advertisements.

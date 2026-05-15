@@ -183,8 +183,12 @@ class Enemy {
 
 class Game {
     constructor() {
+        console.log("Game constructing...");
         this.canvas = document.getElementById('gameCanvas');
-        if (!this.canvas) return;
+        if (!this.canvas) {
+            console.error("Canvas not found!");
+            return;
+        }
         this.ctx = this.canvas.getContext('2d');
         this.hud = document.getElementById('hud');
         this.overlay = document.getElementById('overlay');
@@ -201,10 +205,15 @@ class Game {
         window.addEventListener('pointermove', updatePointer);
         
         this.init();
-        if (this.overlay) this.overlay.show('start', (name) => {
-            this.nickname = name;
-            this.start();
-        });
+        if (this.overlay) {
+            console.log("Showing overlay...");
+            this.overlay.show('start', (name) => {
+                this.nickname = name;
+                this.start();
+            });
+        } else {
+            console.error("Overlay not found!");
+        }
     }
 
     init() {
@@ -212,7 +221,7 @@ class Game {
         this.shield = { angle: 0, arcLength: Math.PI * 0.4, distance: 45, thickness: 8 };
         this.enemies = []; this.score = 0; this.stage = 1; this.totalMerges = 0; this.gameTime = 0;
         this.running = false; this.spawnTimer = 0; 
-        this.baseSpawnRate = 0.875; 
+        this.baseSpawnRate = 1.09375; 
         this.currentSpeed = 200;
         this.lastEnemyDistance = 0;
         if (this.hud) this.hud.update(this.score, this.stage, COLORS[0].name, this.currentSpeed);
@@ -226,9 +235,19 @@ class Game {
 
     start() {
         this.init();
-        this.running = true;
-        this.lastTime = performance.now();
-        requestAnimationFrame((t) => this.gameLoop(t));
+        this.resume();
+    }
+
+    pause() {
+        this.running = false;
+    }
+
+    resume() {
+        if (!this.running) {
+            this.running = true;
+            this.lastTime = performance.now();
+            requestAnimationFrame((t) => this.gameLoop(t));
+        }
     }
 
     gameLoop(currentTime) {
@@ -256,12 +275,9 @@ class Game {
         this.lastEnemyDistance -= this.currentSpeed * dt;
         if (this.lastEnemyDistance < 0) this.lastEnemyDistance = 0;
 
-        // Speed plateau at 500
-        let inc = 0;
-        if (this.currentSpeed < 500) {
-            inc = this.currentSpeed >= 700 ? 0.25 : (this.currentSpeed >= 600 ? 0.5 : (this.currentSpeed >= 500 ? 1 : 2));
-        }
-        this.currentSpeed += inc * dt;
+        // Speed logic
+        let inc = this.currentSpeed >= 700 ? 1 : (this.currentSpeed >= 600 ? 2 : (this.currentSpeed >= 500 ? 4 : 8));
+        this.currentSpeed += (inc / 2) * dt; // Halved as per blueprint
         
         // Conditional spawn rate based on speed
         if (this.currentSpeed >= 500) {
@@ -276,7 +292,7 @@ class Game {
             this.baseSpawnRate = 0.7;
             this.plateauStartTime = null;
         } else {
-            this.baseSpawnRate = 0.875;
+            this.baseSpawnRate = 1.09375;
             this.plateauStartTime = null;
         }
 
@@ -284,8 +300,6 @@ class Game {
         const currentSpawnRate = Math.max(0.35, this.baseSpawnRate);
         
         if (this.spawnTimer > currentSpawnRate) {
-            // Enhanced spacing logic: ensure arrival time gap to prevent simultaneous reach
-            // Minimum arrival gap matches the minimum possible spawn rate (0.35s)
             const requiredDist = this.lastEnemyDistance + (0.35 * this.currentSpeed);
             const newEnemy = new Enemy(this.canvas, COLORS[this.core.colorIndex], this.currentSpeed, requiredDist);
             this.enemies.push(newEnemy);
@@ -305,7 +319,6 @@ class Game {
             let diff = Math.atan2(e.y - this.center.y, e.x - this.center.x) - this.shield.angle;
             while (diff < -Math.PI) diff += Math.PI * 2; while (diff > Math.PI) diff -= Math.PI * 2;
 
-            // Improved precision: include enemy radius in angular hit detection
             const angularWidth = Math.atan2(e.radius, dist);
             const isWithinArc = Math.abs(diff) < (this.shield.arcLength / 2) + angularWidth;
             const isWithinDistance = dist < this.shield.distance + 15 && dist > this.shield.distance - 15;
@@ -316,8 +329,8 @@ class Game {
             } else if (dist < this.core.radius + 10) {
                 if (e.colorInfo.name === COLORS[this.core.colorIndex].name) {
                     this.score += 10; this.totalMerges++; 
-                    if (this.score < 170) this.core.radius *= 1.05; // Growth limit at score 170
-                    if (this.currentSpeed < 400) this.currentSpeed += 2.5; // Speed plateau
+                    if (this.score < 170) this.core.radius *= 1.05; 
+                    if (this.currentSpeed < 500) this.currentSpeed += 2.5; 
                     this.core.colorIndex = (this.core.colorIndex + 1) % COLORS.length;
                     if (this.core.colorIndex === 0) this.stage++;
                     this.enemies.splice(i, 1);
@@ -364,4 +377,5 @@ class Game {
     }
 }
 
-new Game();
+console.log("main.js loaded");
+window.game = new Game();
